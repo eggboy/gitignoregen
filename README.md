@@ -4,14 +4,21 @@ Auto-generate `.gitignore` based on detected project type.
 
 Scans your project directory for marker files (e.g. `pom.xml`, `pyproject.toml`, `package.json`), detects the project type, and pulls matching templates from [gitignore.io](https://www.toptal.com/developers/gitignore). Editor (VSCode, JetBrains) and OS files are always included.
 
+## Always Included
+
+Every generated `.gitignore` includes templates for:
+
+- **Editors** — VS Code, JetBrains (IntelliJ, PyCharm, WebStorm, etc.)
+- **OS files** — macOS (`.DS_Store`), Windows (`Thumbs.db`), Linux
+
 ## Supported Project Types
 
-| Type | Detected By |
-|------|-------------|
-| Java | `pom.xml`, `build.gradle`, `*.java` |
-| Python | `pyproject.toml`, `requirements.txt`, `setup.py`, `*.py` |
-| Node.js | `package.json`, `yarn.lock`, `*.ts` |
-| .NET | `*.csproj`, `*.sln`, `*.fsproj` |
+| Type | Detected By | Templates |
+|------|-------------|-----------|
+| Java | `pom.xml`, `build.gradle`, `*.java` | Java, Maven, Gradle |
+| Python | `pyproject.toml`, `requirements.txt`, `setup.py`, `*.py` | Python, Jupyter Notebooks, virtualenv |
+| Node.js | `package.json`, `yarn.lock`, `*.ts` | Node |
+| .NET | `*.csproj`, `*.sln`, `*.fsproj` | .NET Core, Visual Studio |
 
 ## Installation
 
