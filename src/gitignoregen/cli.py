@@ -71,12 +71,24 @@ def detect_project_types(directory: Path) -> list[str]:
     return detected
 
 
+def _strip_api_comments(text: str) -> str:
+    """Remove gitignore.io header/footer comment lines."""
+    lines = text.splitlines(keepends=True)
+    return "".join(
+        line
+        for line in lines
+        if not line.startswith("# Created by https://www.toptal.com/developers/gitignore")
+        and not line.startswith("# Edit at https://www.toptal.com/developers/gitignore")
+        and not line.startswith("# End of https://www.toptal.com/developers/gitignore")
+    )
+
+
 def fetch_gitignore(templates: list[str]) -> str:
     """Fetch .gitignore content from gitignore.io (Toptal) API."""
     url = f"{GITIGNORE_API}/{','.join(templates)}"
     resp = httpx.get(url, follow_redirects=True, timeout=15)
     resp.raise_for_status()
-    return resp.text
+    return _strip_api_comments(resp.text)
 
 
 def dedupe(items: list[str]) -> list[str]:
@@ -191,7 +203,7 @@ def main(
     mode = "a" if append else "w"
     with open(out_path, mode) as fh:
         if append:
-            fh.write("\n\n# --- Auto-generated additions ---\n")
+            fh.write("\n")
         fh.write(content)
         fh.write("\n")
 
