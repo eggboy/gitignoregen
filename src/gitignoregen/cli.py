@@ -122,17 +122,13 @@ def _sigint_handler(sig: int, frame: object) -> None:
     help="Comma-separated extra gitignore.io templates (e.g. terraform,docker).",
 )
 @click.option("--output", "-o", default=".gitignore", help="Output file (default: .gitignore).")
-@click.option("--append", "-a", is_flag=True, help="Append instead of overwrite.")
 @click.option("--dry-run", "-n", is_flag=True, help="Print to stdout; don't write file.")
-@click.option("--yes", "-y", is_flag=True, help="Overwrite without confirmation.")
 @click.option("--dir", "-d", "directory", default=".", help="Directory to scan (default: cwd).")
 def main(
     project_types: tuple[str, ...],
     extra: str,
     output: str,
-    append: bool,
     dry_run: bool,
-    yes: bool,
     directory: str,
 ) -> None:
     """Auto-generate .gitignore for your project.
@@ -188,10 +184,9 @@ def main(
 
     out_path = target / output
 
-    if out_path.exists() and not append and not yes:
-        if not click.confirm(f"{_icon('⚠️', '[!]')}  {output} already exists. Overwrite?"):
-            click.echo("Aborted.", err=True)
-            sys.exit(1)
+    append = out_path.exists()
+    if append:
+        click.echo(f"{_icon('📎', '[i]')} {output} exists — appending.", err=True)
 
     mode = "a" if append else "w"
     with open(out_path, mode) as fh:
