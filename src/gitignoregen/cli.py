@@ -74,13 +74,15 @@ def detect_project_types(directory: Path) -> list[str]:
 def _strip_api_comments(text: str) -> str:
     """Remove gitignore.io header/footer comment lines."""
     lines = text.splitlines(keepends=True)
-    return "".join(
+    result = "".join(
         line
         for line in lines
         if not line.startswith("# Created by https://www.toptal.com/developers/gitignore")
         and not line.startswith("# Edit at https://www.toptal.com/developers/gitignore")
         and not line.startswith("# End of https://www.toptal.com/developers/gitignore")
+        and not line.startswith("# --- Auto-generated additions ---")
     )
+    return result.strip("\n") + "\n"
 
 
 def fetch_gitignore(templates: list[str]) -> str:
@@ -199,13 +201,16 @@ def main(
     append = out_path.exists()
     if append:
         click.echo(f"{_icon('📎', '[i]')} {output} exists — appending.", err=True)
-
-    mode = "a" if append else "w"
-    with open(out_path, mode) as fh:
-        if append:
+        existing = _strip_api_comments(out_path.read_text())
+        with open(out_path, "w") as fh:
+            fh.write(existing)
             fh.write("\n")
-        fh.write(content)
-        fh.write("\n")
+            fh.write(content)
+            fh.write("\n")
+    else:
+        with open(out_path, "w") as fh:
+            fh.write(content)
+            fh.write("\n")
 
     verb = "Appended to" if append else "Generated"
     click.echo(f"{_icon('✅', '[ok]')} {verb} {out_path}", err=True)
